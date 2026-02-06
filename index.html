@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Golden Pot Treasures - E-Commerce</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        color: white;
+        margin-bottom: 50px;
+        padding: 30px 0;
+      }
+
+      header h1 {
+        font-size: 3em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 40px;
+        margin-bottom: 50px;
+      }
+
+      .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+        cursor: pointer;
+      }
+
+      .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .product-image {
+        width: 100%;
+        height: 280px;
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .pot {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+      }
+
+      .pot img {
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .product-info {
+        padding: 25px;
+      }
+
+      .product-title {
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      .product-description {
+        color: #666;
+        font-size: 0.95em;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .price-button {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .price-button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .price-button:active {
+        transform: scale(0.98);
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-content {
+        background-color: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 500px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+      }
+
+      .modal-content h2 {
+        color: #764ba2;
+        margin-bottom: 30px;
+        font-size: 1.8em;
+      }
+
+      .modal-content p {
+        color: #333;
+        font-size: 1.1em;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+      }
+
+      .modal-btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .yes-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .yes-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .no-btn {
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      .no-btn:hover {
+        background: #d0d0d0;
+        transform: scale(1.05);
+      }
+
+      .response-message {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 8px;
+        font-size: 1.2em;
+        font-weight: bold;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .love-message {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+        color: white;
+      }
+
+      .reject-message {
+        background: linear-gradient(135deg, #ffa500 0%, #ffb347 100%);
+        color: white;
+      }
+
+      .close-modal {
+        margin-top: 20px;
+        padding: 10px 25px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .close-modal:hover {
+        background: #764ba2;
+      }
+
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 2em;
+        }
+
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+          padding: 30px;
+          margin: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>✨ Golden Pot Treasures ✨</h1>
+        <p>Magical Cooking Pots for Every Kitchen</p>
+      </header>
+
+      <div class="products-grid">
+        <!-- Small Pot -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="pot" style="transform: scale(0.7)">
+              <img
+                src="data:image/png;base64,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"
+                alt="Small Golden Pot"
+              />
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-title">Small Golden Pot</div>
+            <div class="product-description">
+              Perfect for sauces and small servings. Compact size ideal for
+              modern kitchens.
+            </div>
+            <button class="price-button" onclick="openModal('small')">
+              Check Price
+            </button>
+          </div>
+        </div>
+
+        <!-- Medium Pot -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="pot">
+              <img
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJ8AAACUCAIAAAACvmx0AAAAIGNIUk0AAHomAACAhAAA+gAAAIDo
+AAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGYktHRAD/AP8A/6C9p5MAAGhjSURBVHja5f3psyRXlh+I
+nXPute4e69tf7plIZGLfC7V0LdNdvVQ3exPVbT1scjQkjTMy2ZhMMplJn2QmjfGPkEk2Gi3GRdNN
+DsWZbqrZZKm32ldUASigACQSidy3t8fm7vfec44+XI94ke8lUEgU0F2kHM8CER6REe73d8++oarC
+z9TxvpejeM9nBNOrCAAKigAKSkoAgIgAgM0nae75Ax4CoAA4ezF9TnjwTPohpYN3ce813/Mcp38f
+z0Ef1xd/VAe+x8npokwXiqaPB+7o8Jlmi3yQx0PXQICzx3vPHF7M90HuYwZ1dtiP/Rce9MD7nLkv
+1cn+0wShAhCopvOm+aL9r5sBprPv/EmPAIAHrgcJFAHo3gudQ3d2evZE517i3FU3LOFjJDD8mePM
+IOmup4/yXvcvAAA0u3oFRUDV5vMm3d6hf/VAd4v3wjH7RkVA2GceeD9OfJ+LbR4PfJY+PoB/5mhX
+AQSEoEFV0on3O2ZL08hDmqeVuZXEKdXKB2aJpFPa1XsEwTyi0+vcv5p7N1CDK+5rBoL73/fxSsaf
+Lbmr+5uc4JDGMre2sz+Z8d/7cfT99/CeU/qBH6f8HEERFJsn6by8N0ne99YOP37fbPNnjnanzJbg
+PpLtAJ00p9PZJGFU9+UtqgIgzIkeVAAE2v+en/Q4o7jpodgAPruIwwjNlHM9qHDJ3H5V+Php62dL
+7urUAGkubu6tKbqzkzI93SxRuhFVRQVAQUTQ+d2gAJgWXh9cWUXF/X+lpAgIKHPozIwmc+9yHvgt
+OfB/AJqaVh/H8TNIu4AAIqAKBEDUSL4kpVRVWAAACRAREIRrREREFRFhVbVEiOkTAoINL1ABAYke
+DaWlxeZoEBLh9Pp+sgABEwaqqogGG2WXAEBBE7kSIIDlCMbc8wUxgghnhZl9Y4wIAGTQIGj6gsOL
+gB8B6D9btAsAPKcjEwAzgACgWDMjFJmuuQAooAAIMDf/ABGEQQQsATNEBhQgAlRgAI2Q5/v6kKRv
+QwVBss0Z1HQOFZudRVMOIQJAQAQ44xkI6SJUmBnYZFkXFDSCiCIiuWa3hABAgAgCgAhEDbmj3t/i
++48T3XtcOgxkEteTUFZEYIwBY6YylkEZLAOIVBUzGwIRqeuqrmvhUNdlORpPytFkMqmqSV36EOpJ
+VQoqsDIIsEZlFBBUA4SWcptlrbzb6rS67XbeMpnr9/vGGGMza61zLs9bWZEbm4NxICIsqorGknEA
+AGC1BDQ5GAPYmL9cx9LX3V4Hpox6xpdFwOB/jOi+z+8i4v4KKPuqDHXVWVhoqJYDMIMKKADGuxvX
+R6PB9vb2zu7WYGd3d3d7d3d3PBlNRkMAMYjGoDHGGDJoANVaC6QECITY2MigCLnLWEVZWEUip+ei
+mOc5WmOts5lzzhV5uygKmxdnTp/t9xfW148urKyAyRJYWgnmPVADPooKkQXj5midZkhKUgMFDAH8
+/w26gijel3VdImK7yMi6pGzF0ViBOfjRYO/2zVtXrrx79erV7Z27t25fJ4IEoTPGOWOtNYaK3CEq
+GVBlZRFljoIqnU4LEa0xSGSIAJEQFWA4GCCRszb9+7S6CjCpvQKoQoyRmVkA0RDZ0XBS+jqEmBX5
++trR8+fPP/LIY0ePHu/3lgw5sBlkOQABEkSIkW1WqBArKBCiIdsIb3iP9f8PG12R+/koMBIGgJiE
+LYCor/b29kbDvauX371z68Zbb71x6eI725sbiNjttNrdVqdVoFVnLKICABnIrLOWdna3M0NZbq0l
+Y4w1ZIwxxqCwISCyRIBoAEQVVbko2ul5otwYPbOySG9xSVVZJIRY17X3MbACULvViaLe+7oKlQ/e
+++CZmZ9++pm1I8fOnTt35uzDqytHoGiBGhAEVwBYAASwwsqqiIhkCcx91+c/SnRDCDt5BgBQjkfX
+rrz76qsvv/ajH924du3GtSutPOv22v1ON88coib+aQ0qikGylpxz1hlHSAYQFUGZQwh1CAEkEpE1
+hAoG1ZBDUgSjwMIgGjNXAAooIakh5zLjbI7W7A72yFhjDKKJIiKgigg0GI05agjsOXJMXlGDiJcv
+X2p12osLy6tHjp45fe7xJ598/MlnV4+f8ZMqK7pAeWLRgQWUjHEI9r5273/Q6IpoRNV5Ny4qAIRy
+fPva1be//73vfPs733jnwlshlmazy0fWlpcXF0SEQwwhSIwclZlV0RV5VdfeewW2ZAAkso91bR0Z
+BOvIEeV53u21F/sL7XaROWNxSsdodHp4H6uqGg6Hw+FwNBp94bKwVpdleR5VQOdTXq7L8Tz2TxVx
+jqlZdqeHBYxBzpg4A3VFJGxjqJJzLs9bWZEbm4NxICIsqorGknEAYmC1BDQ5GAPYmL9cx9LX3V4H
+pox6xpdFwOB/jOi+z+8i4v4KKPuqDHXVWVhoqJYDMIMKKADGuxvXR6PB9vb2zu7WYGd3d3d7d3d3
+PBlNRkMAMYjGoDHGGDJoANVaC6QECITY2MigCLnLWEVZWEUip+eiWOc5WmOts5lzzhV5uygKmxdn
+Tp/t9xfW148urKyAyRJYWgnmPVADPooKkQXj5midZkhKUgMFDAH8/w26gijel3VdImK7yMi6pGzF
+0ViBOfjRYO/2zVtXrrx79erV7Z27t25fJ4IEoTPGOWOtNYaK3CEqGVBlZRFljoIqnU4LEa0xSGSI
+AJEQFWA4GCCRszb9+7S6CjCpvQKoQoyRmVkA0RDZ0XBS+jqEmBX5+trR8+fPP/LIY0ePHu/3lgw5
+sBlkOQABEkSIkW1WqBArKBCiIdsIb3iP9f8PG12R+/koMBIGgJiELYCor/b29kbDvauX371z68Zb
+b71x6eI725sbiNjttNrdVqdVoFVnLKICABnIrLOWdna3M0NZbq0lY4w1ZIwxxqCwISCyRIBoAEQV
+Vbko2ul5otwYPbOySG9xSVVZJIRY17X3MbACULvViaLe+7oKlQ/e++CZmZ9++pm1I8fOnTt35uzD
+qytHoGiBGhAEVwBYAASwwsqqiIhkCcx91+c/SnRDCDt5BgBQjkfXrrz76qsvv/ajH924du3GtSut
+POv22v1ON88coib+aQ0qikGylpxz1hlHSAYQFUGZQwh1CAEkEpE1hAoG1ZBDUgSjwMIgGjNXAAoo
+Iakh5zLjbI7W7A72yFhjDKKJIiKgigg0GI05agjsOXJMXlGDiJcvX2p12osLy6tHjp45fe7xJ598
+/MlnV4+f8ZMqK7pAeWLRgQWUjHEI9r5273/Q6IpoRNV5Ny4qAIRyfPva1be//73vfPs733jnwlsv
+7xVmL7f2Qlq+xGKjbz0M42q92t/U/BNHJ3VjGDsWF9BokBYMJCbVd9MWvHGEOAp4qVHVkb+jRzCm
+DcXQY6F7LnmKjmvF6fzHfsFRkCcnFB8SfOVVnWx/J1d9a5VRMv5LJL+iXCIZMoIlVjvQ0nh2OOoG
+WK7cIvK/oZ4KN9VwXh9IjM6sNaHIlFMv9eX8ULCgKQ8VVHMa3q1/bEFW2Kfv5J8kqXmrMhRrEXU
+DGAzfBfwVDQZMa4UPAZ8RcREfLBSk12XuqkbdgECQZ0xNqkMh3AZV+lIhQ6mFEiAV9kfVF++L2GS
+t5sZJWHXN0WVbkXVLCVsFjsVWxvfCqEaIlJEt5r0HqXg8C+BH5OafKGDq5F6JVhBt3mGdRU7UW4T
+apK5XswPPL2G1lEIy7zx6SHgkkKM3hjJb7qC0S1RoMI11EvlXFqFIqkGLqWzIgGbYEPSfGzm0dq2
+TS6kl0fy2/EwPeNzXqM+tqGXhKPnUPg4xFnfIdFRozQVvqNIzO2L3r8Jf7OJ9hB8C6p5rFyq4fPB
+J0XT9G7Cy+8Lz5Q4Ub9HqhpIGKmNHgdSdWKSRRTqiNkn/Kz2eUoXX63FpOREkEzFy7P7Bm9i4u8
+jMtq9Jm0Wc7qKd8RZCNEv9UQEAAAABJRU5ErkJggg=="
+                alt="Medium Golden Pot"
+              />
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-title">Medium Golden Pot</div>
+            <div class="product-description">
+              Versatile medium-sized pot for everyday cooking. Best seller in
+              our collection.
+            </div>
+            <button class="price-button" onclick="openModal('medium')">
+              Check Price
+            </button>
+          </div>
+        </div>
+
+        <!-- Large Pot -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="pot" style="transform: scale(1.3)">
+              <img
+                src="data:image/png;base64,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"
+                alt="Large Golden Pot"
+              />
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-title">Large Golden Pot</div>
+            <div class="product-description">
+              Spacious pot perfect for family meals and batch cooking.
+              Professional quality.
+            </div>
+            <button class="price-button" onclick="openModal('large')">
+              Check Price
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <h2 id="modalTitle"></h2>
+        <p id="modalMessage"></p>
+        <div id="buttonContainer" class="modal-buttons">
+          <button class="modal-btn yes-btn" onclick="respondYes()">
+            Yes ❤️
+          </button>
+          <button class="modal-btn no-btn" onclick="respondNo()">No</button>
+        </div>
+        <div id="responseContainer"></div>
+        <button
+          class="close-modal"
+          id="closeBtn"
+          style="display: none"
+          onclick="closeModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function openModal(size) {
+        const modal = document.getElementById("modal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalMessage = document.getElementById("modalMessage");
+        const buttonContainer = document.getElementById("buttonContainer");
+        const responseContainer = document.getElementById("responseContainer");
+        const closeBtn = document.getElementById("closeBtn");
+
+        // Reset the modal
+        buttonContainer.style.display = "flex";
+        responseContainer.innerHTML = "";
+        closeBtn.style.display = "none";
+
+        // Set modal content
+        modalTitle.textContent = "Would you be my Valentine, Similoluwa? 💝";
+        modalMessage.textContent =
+          "Before we reveal the price, answer this special question...";
+
+        modal.classList.add("show");
+      }
+
+      function respondYes() {
+        const buttonContainer = document.getElementById("buttonContainer");
+        const responseContainer = document.getElementById("responseContainer");
+        const closeBtn = document.getElementById("closeBtn");
+
+        buttonContainer.style.display = "none";
+        responseContainer.innerHTML =
+          '<div class="response-message love-message">💕 I love you 💕</div>';
+        closeBtn.style.display = "block";
+      }
+
+      function respondNo() {
+        const buttonContainer = document.getElementById("buttonContainer");
+        const responseContainer = document.getElementById("responseContainer");
+        const closeBtn = document.getElementById("closeBtn");
+
+        buttonContainer.style.display = "none";
+        responseContainer.innerHTML =
+          '<div class="response-message reject-message">⛔ We don\'t do that here ⛔</div>';
+        closeBtn.style.display = "block";
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("modal");
+        modal.classList.remove("show");
+      }
+
+      // Close modal when clicking outside
+      const modal = document.getElementById("modal");
+      window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+    </script>
+  </body>
+</html>
